@@ -7,7 +7,40 @@
     <title>dynamicwebbrussels</title>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+   <body>
+    <body>
+  <h1>Brussels Explorer</h1>
+
+  <div class="controls">
+    <input type="text" placeholder="Zoek..." id="search" />
+
+    <select id="filter">
+      <option value="">Filter</option>
+    </select>
+
+    <select id="sort">
+      <option value="">Sorteren</option>
+    </select>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Type</th>
+        <th>Gemeente</th>
+        <th>Adres</th>
+        <th>Categorie</th>
+        <th>Website</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+
+</body>
   </body>
 </html>
