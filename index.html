@@ -1,46 +1,35 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dynamicwebbrussels</title>
+    <title>Brussels Explorer</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-   <body>
-    <body>
-  <h1>Brussels Explorer</h1>
-
-  <div class="controls">
-    <input type="text" placeholder="Zoek..." id="search" />
-
-    <select id="filter">
-      <option value="">Filter</option>
-    </select>
-
-    <select id="sort">
-      <option value="">Sorteren</option>
-    </select>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Naam</th>
-        <th>Type</th>
-        <th>Gemeente</th>
-        <th>Adres</th>
-        <th>Categorie</th>
-        <th>Website</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>
-
-  <script type="module" src="/src/main.js"></script>
-</body>
-
-
-</body>
+    <h1>Brussels Explorer</h1>
+    <div class="controls">
+      <input type="text" placeholder="Zoek..." id="search" />
+      <select id="filter">
+        <option value="">Filter op type</option>
+      </select>
+      <select id="sort">
+        <option value="">Sorteren</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Naam</th>
+          <th>Type</th>
+          <th>Gemeente</th>
+          <th>Adres</th>
+          <th>Categorie</th>
+          <th>Website</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
