@@ -9,10 +9,12 @@
   <body>
     <h1>Brussels Explorer</h1>
     <div class="controls">
+      <!-- Zoekveld voor locaties filteren op naam -->
       <input type="text" placeholder="Zoek..." id="search" />
       <select id="filter">
         <option value="">Filter op type</option>
       </select>
+      <!-- Soorteren  op naam of gemeente-->
       <select id="sort">
         <option value="">Sorteren</option>
       </select>
@@ -28,6 +30,7 @@
           <th>Website</th>
         </tr>
       </thead>
+      <!-- Tabel waar de API data in geladen wordt -->
       <tbody id="table-body"></tbody>
     </table>
     <script type="module" src="/src/main.js"></script>
