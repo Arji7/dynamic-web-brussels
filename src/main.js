@@ -1,54 +1,117 @@
-// Auteur: Ayoub Rajouai 
-// Datum: maart 2026
+// Auteur: Ayoub Rajouai
+// Datum: april 2026
 // Bron API: https://opendata.brussels.be
 // AI assistent: Claude (Anthropic) 
 
-// Importeer de CSS styling//
 import './style.css';
 
-// URL van de Brussels API
+// link naar de api
 const API_URL = 'https://opendata.brussels.be/api/explore/v2.1/catalog/datasets/lieux_culturels_touristiques_evenementiels_visitbrussels_vbx/records?limit=100';
 
-// selecteer de tabel body uit de HTML//
+// html elementen ophalen
 const tableBody = document.getElementById('table-body');
+const searchInput = document.getElementById('search');
+const filterSelect = document.getElementById('filter');
+const sortSelect = document.getElementById('sort');
 
-// data ophalen van de API met fetch en async/await//
+// hier sla ik alle locaties op zodat ik ze later kan gebruiken
+let allLocations = [];
+
+// data ophalen van de api
 const fetchData = async () => {
   try {
-    // api aanroepen//
     const response = await fetch(API_URL);
-
-    //JSON data ophalen uit de response//
     const data = await response.json();
 
-    // Tabel vullen met de opgehaalde data //
-    fillTable(data.results);
+    // resultaten opslaan
+    allLocations = data.results;
 
+    fillFilter(allLocations);
+    fillTable(allLocations);
   } catch (error) {
-    console.error('Fout bij ophalen data:', error);
+    // als er iets fout gaat tonen we een foutmelding
+    console.error('error:', error);
   }
 };
 
-// tabel vullen met locaties//
-const fillTable = (locations) => {
-  // Elke locatie toevoegen als rij in de tabel//
+// dropdown vullen met alle categorieën uit de api
+const fillFilter = (locations) => {
+  const categories = [];
+
   locations.forEach(location => {
-    // Template literal gebruiken voor de HTML van elke rij//
+    if (location.visit_category_nl_multi) {
+      location.visit_category_nl_multi.forEach(cat => {
+        // categorie niet 2 keer toevoegen
+        if (!categories.includes(cat)) {
+          categories.push(cat);
+        }
+      });
+    }
+  });
+
+  // alfabetisch sorteren
+  categories.sort();
+
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    filterSelect.appendChild(option);
+  });
+};
+
+// tabel vullen met locaties
+const fillTable = (locations) => {
+  // eerst leegmaken
+  tableBody.innerHTML = '';
+
+  // melding als er niets gevonden is
+  if (locations.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="6">Geen resultaten gevonden</td></tr>';
+    return;
+  }
+
+  locations.forEach(location => {
+    // rij aanmaken met template literal
     const row = `
       <tr>
-        <td>${location.translations_fr_name ?? 'Onbekend'}</td>
-        <td>${location.visit_category_fr_multi ? location.visit_category_fr_multi[0] : 'Onbekend'}</td>
-        <td>${location.add_municipality_fr ?? 'Onbekend'}</td>
-        <td>${location.translations_fr_address_line1 ?? 'Onbekend'}</td>
-        <td>${location.visit_category_fr_multi ? location.visit_category_fr_multi.join(', ') : 'Onbekend'}</td>
+        <td>${location.translations_nl_name ?? 'Onbekend'}</td>
+        <td>${location.visit_category_nl_multi ? location.visit_category_nl_multi[0] : 'Onbekend'}</td>
+        <td>${location.add_municipality_nl ?? 'Onbekend'}</td>
+        <td>${location.translations_nl_address_line1 ?? 'Onbekend'}</td>
+        <td>${location.visit_category_nl_multi ? location.visit_category_nl_multi.join(', ') : 'Onbekend'}</td>
         <td>${location.translations_fr_website ? `<a href="${location.translations_fr_website}" target="_blank">Website</a>` : 'Geen website'}</td>
       </tr>
     `;
-
-    // Rij toevoegen aan de tabel//
     tableBody.innerHTML += row;
   });
 };
 
-// App opstarten//
+// zoeken en filteren combineren
+const filterAndSearch = () => {
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedFilter = filterSelect.value;
+
+  // alleen locaties tonen die overeenkomen
+  const filtered = allLocations.filter(location => {
+    const name = location.translations_nl_name?.toLowerCase() ?? '';
+
+    // checken of naam overeenkomt met zoekterm
+    const matchesSearch = searchTerm === '' ? true : name.includes(searchTerm);
+
+    // checken of categorie overeenkomt met filter
+    const matchesFilter = selectedFilter === '' ? true :
+      location.visit_category_nl_multi?.includes(selectedFilter);
+
+    return matchesSearch && matchesFilter;
+  });
+
+  fillTable(filtered);
+};
+
+// luisteren naar zoek en filter
+searchInput.addEventListener('input', filterAndSearch);
+filterSelect.addEventListener('change', filterAndSearch);
+
+// app starten
 fetchData();
