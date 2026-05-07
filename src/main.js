@@ -17,19 +17,20 @@ const sortSelect = document.getElementById('sort');
 // hier sla ik alle locaties op zodat ik ze later kan gebruiken
 let allLocations = [];
 
+// favorieten ophalen uit localstorage of lege array
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
 // data ophalen van de api
 const fetchData = async () => {
   try {
     const response = await fetch(API_URL);
     const data = await response.json();
 
-    // resultaten opslaan
     allLocations = data.results;
 
     fillFilter(allLocations);
     fillTable(allLocations);
   } catch (error) {
-    // als er iets fout gaat tonen we een foutmelding
     console.error('error:', error);
   }
 };
@@ -41,7 +42,6 @@ const fillFilter = (locations) => {
   locations.forEach(location => {
     if (location.visit_category_nl_multi) {
       location.visit_category_nl_multi.forEach(cat => {
-        // categorie niet 2 keer toevoegen
         if (!categories.includes(cat)) {
           categories.push(cat);
         }
@@ -49,7 +49,6 @@ const fillFilter = (locations) => {
     }
   });
 
-  // alfabetisch sorteren
   categories.sort();
 
   categories.forEach(cat => {
@@ -62,17 +61,18 @@ const fillFilter = (locations) => {
 
 // tabel vullen met locaties
 const fillTable = (locations) => {
-  // eerst leegmaken
   tableBody.innerHTML = '';
 
-  // melding als er niets gevonden is
   if (locations.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="6">Geen resultaten gevonden</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="7">Geen resultaten gevonden</td></tr>';
     return;
   }
 
   locations.forEach(location => {
-    // rij aanmaken met template literal
+    // checken of locatie al favoriet is
+    const isFav = favorites.includes(location.id);
+    const star = isFav ? '★' : '☆';
+
     const row = `
       <tr>
         <td>${location.translations_nl_name ?? 'Onbekend'}</td>
@@ -81,10 +81,36 @@ const fillTable = (locations) => {
         <td>${location.translations_nl_address_line1 ?? 'Onbekend'}</td>
         <td>${location.visit_category_nl_multi ? location.visit_category_nl_multi.join(', ') : 'Onbekend'}</td>
         <td>${location.translations_fr_website ? `<a href="${location.translations_fr_website}" target="_blank">Website</a>` : 'Geen website'}</td>
+        <td><button class="fav-btn" data-id="${location.id}">${star}</button></td>
       </tr>
     `;
     tableBody.innerHTML += row;
   });
+
+  // event listeners toevoegen aan favorieten knoppen
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', toggleFavorite);
+  });
+};
+
+// favoriet toggle (toevoegen of verwijderen)
+const toggleFavorite = (event) => {
+  const id = event.target.dataset.id;
+
+  // checken of al favoriet is
+  if (favorites.includes(id)) {
+    // verwijderen uit favorieten
+    favorites = favorites.filter(favId => favId !== id);
+  } else {
+    // toevoegen aan favorieten
+    favorites.push(id);
+  }
+
+  // opslaan in localstorage
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+
+  // tabel opnieuw tonen
+  filterAndSearch();
 };
 
 // zoeken en filteren combineren
@@ -92,17 +118,11 @@ const filterAndSearch = () => {
   const searchTerm = searchInput.value.toLowerCase();
   const selectedFilter = filterSelect.value;
 
-  // alleen locaties tonen die overeenkomen
   const filtered = allLocations.filter(location => {
     const name = location.translations_nl_name?.toLowerCase() ?? '';
-
-    // checken of naam overeenkomt met zoekterm
     const matchesSearch = searchTerm === '' ? true : name.includes(searchTerm);
-
-    // checken of categorie overeenkomt met filter
     const matchesFilter = selectedFilter === '' ? true :
       location.visit_category_nl_multi?.includes(selectedFilter);
-
     return matchesSearch && matchesFilter;
   });
 
@@ -113,7 +133,6 @@ const filterAndSearch = () => {
 const sortLocations = () => {
   const sortValue = sortSelect.value;
 
-  // kopie maken zodat de originele array niet wijzigt
   const sorted = [...allLocations].sort((a, b) => {
     if (sortValue === 'naam') {
       return (a.translations_nl_name ?? '').localeCompare(b.translations_nl_name ?? '');
