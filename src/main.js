@@ -1,7 +1,7 @@
 // Auteur: Ayoub Rajouai
 // Datum: april 2026
 // Bron API: https://opendata.brussels.be
-// AI assistent: Claude (Anthropic) 
+// AI assistent: Claude (Anthropic)
 
 import './style.css';
 
@@ -109,9 +109,27 @@ const filterAndSearch = () => {
   fillTable(filtered);
 };
 
-// luisteren naar zoek en filter
+// sorteren op naam of gemeente
+const sortLocations = () => {
+  const sortValue = sortSelect.value;
+
+  // kopie maken zodat de originele array niet wijzigt
+  const sorted = [...allLocations].sort((a, b) => {
+    if (sortValue === 'naam') {
+      return (a.translations_nl_name ?? '').localeCompare(b.translations_nl_name ?? '');
+    } else if (sortValue === 'gemeente') {
+      return (a.add_municipality_nl ?? '').localeCompare(b.add_municipality_nl ?? '');
+    }
+    return 0;
+  });
+
+  fillTable(sorted);
+};
+
+// luisteren naar zoek, filter en sort
 searchInput.addEventListener('input', filterAndSearch);
 filterSelect.addEventListener('change', filterAndSearch);
+sortSelect.addEventListener('change', sortLocations);
 
 // app starten
 fetchData();
