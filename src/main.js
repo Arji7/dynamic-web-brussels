@@ -166,3 +166,72 @@ sortSelect.addEventListener('change', sortLocations);
 
 // app starten
 fetchData();
+// formulier validatie
+const form = document.getElementById('suggestion-form');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const suggestionInput = document.getElementById('suggestion');
+const suggestionsList = document.getElementById('suggestions-list');
+
+// suggesties ophalen uit localstorage
+let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
+
+// suggesties tonen op de pagina
+const showSuggestions = () => {
+  suggestionsList.innerHTML = '';
+  suggestions.forEach(s => {
+    suggestionsList.innerHTML += `
+      <div class="suggestion-item">
+        <strong>${s.name}</strong> (${s.email})<br>
+        ${s.suggestion}
+      </div>
+    `;
+  });
+};
+
+// formulier valideren bij verzenden
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  // foutmeldingen leegmaken
+  document.getElementById('name-error').textContent = '';
+  document.getElementById('email-error').textContent = '';
+  document.getElementById('suggestion-error').textContent = '';
+
+  let valid = true;
+
+  // naam validatie
+  if (nameInput.value.trim().length < 3) {
+    document.getElementById('name-error').textContent = 'Naam moet minstens 3 letters hebben';
+    valid = false;
+  }
+
+  // email validatie
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailInput.value)) {
+    document.getElementById('email-error').textContent = 'Geen geldig email adres';
+    valid = false;
+  }
+
+  // suggestie validatie
+  if (suggestionInput.value.trim() === '') {
+    document.getElementById('suggestion-error').textContent = 'Suggestie mag niet leeg zijn';
+    valid = false;
+  }
+
+  // als alles ok is opslaan
+  if (valid) {
+    suggestions.push({
+      name: nameInput.value,
+      email: emailInput.value,
+      suggestion: suggestionInput.value
+    });
+
+    localStorage.setItem('suggestions', JSON.stringify(suggestions));
+    showSuggestions();
+    form.reset();
+  }
+});
+
+// suggesties tonen bij het laden
+showSuggestions();

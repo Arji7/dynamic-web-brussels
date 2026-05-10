@@ -50,3 +50,49 @@ tbody tr.visible {
   opacity: 1;
   transform: translateY(0);
 }
+.form-section {
+  margin-top: 40px;
+  padding: 20px;
+  background: white;
+  border-radius: 4px;
+}
+
+.form-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 500px;
+}
+
+.form-section input,
+.form-section textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-section button {
+  padding: 10px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+}
+
+#suggestions-list {
+  margin-top: 20px;
+}
+
+.suggestion-item {
+  padding: 10px;
+  background: #f9f9f9;
+  border-left: 3px solid #333;
+  margin-bottom: 8px;
+}
