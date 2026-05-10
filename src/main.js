@@ -59,6 +59,15 @@ const fillFilter = (locations) => {
   });
 };
 
+// observer api - fade in effect bij scrollen
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
 // tabel vullen met locaties
 const fillTable = (locations) => {
   tableBody.innerHTML = '';
@@ -90,6 +99,11 @@ const fillTable = (locations) => {
   // event listeners toevoegen aan favorieten knoppen
   document.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', toggleFavorite);
+  });
+
+  // observer toevoegen aan elke rij voor fade-in effect
+  document.querySelectorAll('tbody tr').forEach(row => {
+    observer.observe(row);
   });
 };
 

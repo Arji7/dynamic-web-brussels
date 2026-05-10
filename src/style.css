@@ -39,3 +39,14 @@ th, td {
 th {
   background: #eee;
 }
+/* fade in effect voor tabel rijen */
+tbody tr {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+tbody tr.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
