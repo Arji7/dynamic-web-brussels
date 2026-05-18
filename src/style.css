@@ -96,3 +96,43 @@ tbody tr.visible {
   border-left: 3px solid #333;
   margin-bottom: 8px;
 }
+
+/* responsive design voor kleinere schermen */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls input,
+  .controls select {
+    width: 100%;
+  }
+
+  /* tabel scrollbaar maken op kleine schermen */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .form-section {
+    padding: 10px;
+  }
+
+  .form-section form {
+    max-width: 100%;
+  }
+}
