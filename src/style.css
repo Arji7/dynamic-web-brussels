@@ -38,7 +38,7 @@ h2 {
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -57,6 +57,34 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(239, 51, 64, 0.2);
 }
 
+/* knoppen om te wisselen tussen tabel en kaarten */
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.view-toggle button {
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.view-toggle button:hover {
+  background: #fef9e0;
+}
+
+.view-toggle button.active {
+  background: #1a1a1a;
+  color: #fdda24;
+}
+
+/* tabel */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -87,7 +115,6 @@ td {
 }
 
 tbody tr {
-  transition: background 0.2s;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s ease, transform 0.5s ease, background 0.2s;
@@ -112,6 +139,102 @@ td a:hover {
   text-decoration: underline;
 }
 
+/* kaarten */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+  opacity: 0;
+  transform: translateY(20px);
+  display: flex;
+  flex-direction: column;
+}
+
+.card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  background: #1a1a1a;
+  color: #fdda24;
+  font-size: 60px;
+  padding: 30px;
+  text-align: center;
+  border-bottom: 4px solid #ef3340;
+}
+
+.card-body {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+
+.card-type {
+  display: inline-block;
+  background: #fdda24;
+  color: #1a1a1a;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-info {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.card-info strong {
+  color: #1a1a1a;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.card-footer a {
+  color: #ef3340;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.card-footer a:hover {
+  text-decoration: underline;
+}
+
 .fav-btn {
   background: none;
   border: none;
@@ -125,6 +248,7 @@ td a:hover {
   transform: scale(1.3);
 }
 
+/* formulier */
 .form-section {
   margin-top: 50px;
   padding: 30px;
@@ -190,7 +314,7 @@ td a:hover {
   border-radius: 4px;
 }
 
-/* responsive design voor kleinere schermen */
+/* responsive */
 @media (max-width: 768px) {
   body {
     padding: 15px;
@@ -207,6 +331,10 @@ td a:hover {
   .controls input,
   .controls select {
     width: 100%;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
   }
 
   table {

@@ -3,7 +3,6 @@
 <!-- Bron API: https://opendata.brussels.be/api/explore/v2.1/catalog/datasets/lieux_culturels_touristiques_evenementiels_visitbrussels_vbx/records -->
 <!-- AI assistent: Claude (Anthropic)  -->
 
-
 <!DOCTYPE html>
 <html lang="nl">
   <head>
@@ -15,19 +14,25 @@
   <body>
     <h1>Brussels Explorer</h1>
     <div class="controls">
-      <!-- Zoekveld voor locaties filteren op naam -->
       <input type="text" placeholder="Zoek..." id="search" />
       <select id="filter">
         <option value="">Filter op type</option>
       </select>
-      <!-- Soorteren  op naam of gemeente-->
       <select id="sort">
         <option value="">Sorteren</option>
         <option value="naam">Naam A-Z</option>
         <option value="gemeente">Gemeente A-Z</option>
       </select>
     </div>
-    <table>
+
+    <!-- Knoppen om te wisselen tussen tabel en kaarten -->
+    <div class="view-toggle">
+      <button id="view-table" class="active">📋 Tabel</button>
+      <button id="view-cards">🎴 Kaarten</button>
+    </div>
+
+    <!-- Tabel weergave -->
+    <table id="table-view">
       <thead>
         <tr>
           <th>Naam</th>
@@ -39,9 +44,11 @@
           <th>Favoriet</th>
         </tr>
       </thead>
-      <!-- Tabel waar de API data in geladen wordt -->
       <tbody id="table-body"></tbody>
     </table>
+
+    <!-- Kaarten weergave -->
+    <div id="cards-container" class="cards-grid" style="display: none;"></div>
 
     <!-- Formulier voor locatie suggesties -->
     <div class="form-section">

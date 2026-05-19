@@ -10,18 +10,44 @@ const API_URL = 'https://opendata.brussels.be/api/explore/v2.1/catalog/datasets/
 
 // html elementen ophalen
 const tableBody = document.getElementById('table-body');
+const tableView = document.getElementById('table-view');
+const cardsContainer = document.getElementById('cards-container');
 const searchInput = document.getElementById('search');
 const filterSelect = document.getElementById('filter');
 const sortSelect = document.getElementById('sort');
+const viewTableBtn = document.getElementById('view-table');
+const viewCardsBtn = document.getElementById('view-cards');
 
-// hier sla ik alle locaties op zodat ik ze later kan gebruiken
+// alle locaties opslaan
 let allLocations = [];
 
 // favorieten ophalen uit localstorage of lege array
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
+// huidige weergave (tabel of kaarten) opslaan in localstorage
+let currentView = localStorage.getItem('view') || 'table';
+
+// icoon kiezen op basis van type
+const getIcon = (type) => {
+  if (!type) return '📍';
+  const t = type.toLowerCase();
+  if (t.includes('musea') || t.includes('museum')) return '🏛️';
+  if (t.includes('monument')) return '🗿';
+  if (t.includes('bar') || t.includes('caf')) return '🍺';
+  if (t.includes('nacht') || t.includes('club')) return '🪩';
+  if (t.includes('muziek')) return '🎵';
+  if (t.includes('kunst')) return '🎨';
+  if (t.includes('podium') || t.includes('theater')) return '🎭';
+  if (t.includes('rondleiding')) return '🚶';
+  if (t.includes('vergader')) return '💼';
+  if (t.includes('attractie')) return '🎢';
+  return '📍';
+};
+
 // data ophalen van de api
 const fetchData = async () => {
+  tableBody.innerHTML = '<tr><td colspan="7">Data wordt geladen...</td></tr>';
+
   try {
     const response = await fetch(API_URL);
     const data = await response.json();
@@ -29,13 +55,14 @@ const fetchData = async () => {
     allLocations = data.results;
 
     fillFilter(allLocations);
-    fillTable(allLocations);
+    render(allLocations);
   } catch (error) {
+    tableBody.innerHTML = '<tr><td colspan="7">Fout bij ophalen data</td></tr>';
     console.error('error:', error);
   }
 };
 
-// dropdown vullen met alle categorieën uit de api
+// dropdown vullen met alle categorieën
 const fillFilter = (locations) => {
   const categories = [];
 
@@ -59,7 +86,7 @@ const fillFilter = (locations) => {
   });
 };
 
-// observer api - fade in effect bij scrollen
+// observer api - fade in effect
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -68,7 +95,16 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 
-// tabel vullen met locaties
+// renderen op basis van huidige view
+const render = (locations) => {
+  if (currentView === 'table') {
+    fillTable(locations);
+  } else {
+    fillCards(locations);
+  }
+};
+
+// tabel vullen
 const fillTable = (locations) => {
   tableBody.innerHTML = '';
 
@@ -78,7 +114,6 @@ const fillTable = (locations) => {
   }
 
   locations.forEach(location => {
-    // checken of locatie al favoriet is
     const isFav = favorites.includes(location.id);
     const star = isFav ? '★' : '☆';
 
@@ -96,38 +131,72 @@ const fillTable = (locations) => {
     tableBody.innerHTML += row;
   });
 
-  // event listeners toevoegen aan favorieten knoppen
   document.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', toggleFavorite);
   });
 
-  // observer toevoegen aan elke rij voor fade-in effect
   document.querySelectorAll('tbody tr').forEach(row => {
     observer.observe(row);
   });
 };
 
-// favoriet toggle (toevoegen of verwijderen)
+// kaarten vullen
+const fillCards = (locations) => {
+  cardsContainer.innerHTML = '';
+
+  if (locations.length === 0) {
+    cardsContainer.innerHTML = '<p>Geen resultaten gevonden</p>';
+    return;
+  }
+
+  locations.forEach(location => {
+    const isFav = favorites.includes(location.id);
+    const star = isFav ? '★' : '☆';
+    const type = location.visit_category_nl_multi ? location.visit_category_nl_multi[0] : 'Onbekend';
+    const icon = getIcon(type);
+
+    const card = `
+      <div class="card">
+        <div class="card-icon">${icon}</div>
+        <div class="card-body">
+          <h3 class="card-title">${location.translations_nl_name ?? 'Onbekend'}</h3>
+          <span class="card-type">${type}</span>
+          <p class="card-info"><strong>Gemeente:</strong> ${location.add_municipality_nl ?? 'Onbekend'}</p>
+          <p class="card-info"><strong>Adres:</strong> ${location.translations_nl_address_line1 ?? 'Onbekend'}</p>
+          <div class="card-footer">
+            ${location.translations_fr_website ? `<a href="${location.translations_fr_website}" target="_blank">Bezoek website</a>` : '<span>Geen website</span>'}
+            <button class="fav-btn" data-id="${location.id}">${star}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    cardsContainer.innerHTML += card;
+  });
+
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', toggleFavorite);
+  });
+
+  document.querySelectorAll('.card').forEach(card => {
+    observer.observe(card);
+  });
+};
+
+// favoriet toggle
 const toggleFavorite = (event) => {
   const id = event.target.dataset.id;
 
-  // checken of al favoriet is
   if (favorites.includes(id)) {
-    // verwijderen uit favorieten
     favorites = favorites.filter(favId => favId !== id);
   } else {
-    // toevoegen aan favorieten
     favorites.push(id);
   }
 
-  // opslaan in localstorage
   localStorage.setItem('favorites', JSON.stringify(favorites));
-
-  // tabel opnieuw tonen
   filterAndSearch();
 };
 
-// zoeken en filteren combineren
+// zoeken en filteren
 const filterAndSearch = () => {
   const searchTerm = searchInput.value.toLowerCase();
   const selectedFilter = filterSelect.value;
@@ -140,10 +209,10 @@ const filterAndSearch = () => {
     return matchesSearch && matchesFilter;
   });
 
-  fillTable(filtered);
+  render(filtered);
 };
 
-// sorteren op naam of gemeente
+// sorteren
 const sortLocations = () => {
   const sortValue = sortSelect.value;
 
@@ -156,16 +225,42 @@ const sortLocations = () => {
     return 0;
   });
 
-  fillTable(sorted);
+  render(sorted);
 };
 
-// luisteren naar zoek, filter en sort
+// wisselen tussen tabel en kaarten weergave
+const switchView = (view) => {
+  currentView = view;
+  localStorage.setItem('view', view);
+
+  if (view === 'table') {
+    tableView.style.display = 'table';
+    cardsContainer.style.display = 'none';
+    viewTableBtn.classList.add('active');
+    viewCardsBtn.classList.remove('active');
+  } else {
+    tableView.style.display = 'none';
+    cardsContainer.style.display = 'grid';
+    viewTableBtn.classList.remove('active');
+    viewCardsBtn.classList.add('active');
+  }
+
+  filterAndSearch();
+};
+
+// event listeners
 searchInput.addEventListener('input', filterAndSearch);
 filterSelect.addEventListener('change', filterAndSearch);
 sortSelect.addEventListener('change', sortLocations);
+viewTableBtn.addEventListener('click', () => switchView('table'));
+viewCardsBtn.addEventListener('click', () => switchView('cards'));
+
+// voorkeursweergave laden bij start
+switchView(currentView);
 
 // app starten
 fetchData();
+
 // formulier validatie
 const form = document.getElementById('suggestion-form');
 const nameInput = document.getElementById('name');
@@ -173,10 +268,8 @@ const emailInput = document.getElementById('email');
 const suggestionInput = document.getElementById('suggestion');
 const suggestionsList = document.getElementById('suggestions-list');
 
-// suggesties ophalen uit localstorage
 let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
 
-// suggesties tonen op de pagina
 const showSuggestions = () => {
   suggestionsList.innerHTML = '';
   suggestions.forEach(s => {
@@ -189,37 +282,31 @@ const showSuggestions = () => {
   });
 };
 
-// formulier valideren bij verzenden
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  // foutmeldingen leegmaken
   document.getElementById('name-error').textContent = '';
   document.getElementById('email-error').textContent = '';
   document.getElementById('suggestion-error').textContent = '';
 
   let valid = true;
 
-  // naam validatie
   if (nameInput.value.trim().length < 3) {
     document.getElementById('name-error').textContent = 'Naam moet minstens 3 letters hebben';
     valid = false;
   }
 
-  // email validatie
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(emailInput.value)) {
     document.getElementById('email-error').textContent = 'Geen geldig email adres';
     valid = false;
   }
 
-  // suggestie validatie
   if (suggestionInput.value.trim() === '') {
     document.getElementById('suggestion-error').textContent = 'Suggestie mag niet leeg zijn';
     valid = false;
   }
 
-  // als alles ok is opslaan
   if (valid) {
     suggestions.push({
       name: nameInput.value,
@@ -233,5 +320,4 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-// suggesties tonen bij het laden
 showSuggestions();
