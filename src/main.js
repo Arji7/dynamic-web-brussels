@@ -17,6 +17,10 @@ const filterSelect = document.getElementById('filter');
 const sortSelect = document.getElementById('sort');
 const viewTableBtn = document.getElementById('view-table');
 const viewCardsBtn = document.getElementById('view-cards');
+const resetBtn = document.getElementById('reset-btn');
+const clearFavsBtn = document.getElementById('clear-favs-btn');
+const resultsCount = document.getElementById('results-count');
+const favsCount = document.getElementById('favs-count');
 
 // alle locaties opslaan
 let allLocations = [];
@@ -95,8 +99,15 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 
+// counters updaten
+const updateCounts = (locations) => {
+  resultsCount.textContent = `${locations.length} locaties gevonden`;
+  favsCount.textContent = `${favorites.length} favorieten ★`;
+};
+
 // renderen op basis van huidige view
 const render = (locations) => {
+  updateCounts(locations);
   if (currentView === 'table') {
     fillTable(locations);
   } else {
@@ -254,6 +265,23 @@ filterSelect.addEventListener('change', filterAndSearch);
 sortSelect.addEventListener('change', sortLocations);
 viewTableBtn.addEventListener('click', () => switchView('table'));
 viewCardsBtn.addEventListener('click', () => switchView('cards'));
+
+// reset alle filters
+resetBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  filterSelect.value = '';
+  sortSelect.value = '';
+  render(allLocations);
+});
+
+// alle favorieten wissen
+clearFavsBtn.addEventListener('click', () => {
+  if (confirm('Ben je zeker dat je alle favorieten wilt wissen?')) {
+    favorites = [];
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    filterAndSearch();
+  }
+});
 
 // voorkeursweergave laden bij start
 switchView(currentView);
