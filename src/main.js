@@ -223,7 +223,7 @@ const filterAndSearch = () => {
   render(filtered);
 };
 
-// sorteren
+// sorteren - fix: gaat nu door filterAndSearch zodat filter/zoek actief blijft
 const sortLocations = () => {
   const sortValue = sortSelect.value;
 
@@ -236,7 +236,8 @@ const sortLocations = () => {
     return 0;
   });
 
-  render(sorted);
+  allLocations = sorted;
+  filterAndSearch();
 };
 
 // wisselen tussen tabel en kaarten weergave
