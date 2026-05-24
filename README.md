@@ -177,4 +177,4 @@ dynamic-web-brussels/
 - [Brussels Open Data](https://opendata.brussels.be/) - API voor culturele en toeristische locaties
 - [Vite](https://vitejs.dev/) - Build tool en dev server
 - [MDN Web Docs](https://developer.mozilla.org/) - Referentie voor JavaScript, CSS en Web API's
-- **AI assistent:** Claude (Anthropic) - Gebruikt voor hulp bij ontwikkeling en debugging
+- - **AI assistent:** Claude (Anthropic) — zie [ai-log.md](ai-log.md) voor de volledige AI log
