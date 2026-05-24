@@ -134,11 +134,15 @@ npm run preview
 
 
 ### Mobiele weergave
-<img width="1084" height="1271" alt="image" src="https://github.com/user-attachments/assets/584f6d68-d190-4a26-9186-523dff520432" />
 
-<img width="1066" height="1109" alt="image" src="https://github.com/user-attachments/assets/a9991f40-fe96-4601-ade2-601786ea4c92" />
+<img width="1049" height="1224" alt="image" src="https://github.com/user-attachments/assets/fa2505a4-be63-4afb-81fc-227828e79aa6" />
 
-<img width="1063" height="1112" alt="image" src="https://github.com/user-attachments/assets/915cd429-4a27-4539-8d29-27fc4cbe9006" />
+<img width="1062" height="1355" alt="image" src="https://github.com/user-attachments/assets/932048f6-314d-4d91-879f-4dd6c305a596" />
+
+<img width="1064" height="1349" alt="image" src="https://github.com/user-attachments/assets/648b6422-0167-420b-9a4e-0eeac40d9c3d" />
+
+
+
 
 
 
