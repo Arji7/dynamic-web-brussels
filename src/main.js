@@ -5,10 +5,10 @@
 
 import './style.css';
 
-// link naar de api
+// CONST - api url als constante zodat die niet per ongeluk verandert
 const API_URL = 'https://opendata.brussels.be/api/explore/v2.1/catalog/datasets/lieux_culturels_touristiques_evenementiels_visitbrussels_vbx/records?limit=100';
 
-// html elementen ophalen
+// DOM MANIPULATIE - elementen selecteren via getElementById
 const tableBody = document.getElementById('table-body');
 const tableView = document.getElementById('table-view');
 const cardsContainer = document.getElementById('cards-container');
@@ -22,16 +22,16 @@ const clearFavsBtn = document.getElementById('clear-favs-btn');
 const resultsCount = document.getElementById('results-count');
 const favsCount = document.getElementById('favs-count');
 
-// alle locaties opslaan
+// alle opgehaalde locaties bijhouden
 let allLocations = [];
 
-// favorieten ophalen uit localstorage of lege array
+// LOCALSTORAGE - favorieten laden uit vorige sessie, of lege array als er geen zijn
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
-// huidige weergave (tabel of kaarten) opslaan in localstorage
+// LOCALSTORAGE - gebruikersvoorkeur voor weergave onthouden tussen sessies
 let currentView = localStorage.getItem('view') || 'table';
 
-// icoon kiezen op basis van type
+// ARROW FUNCTION + TERNARY OPERATOR - juist icoon kiezen op basis van het type locatie
 const getIcon = (type) => {
   if (!type) return '📍';
   const t = type.toLowerCase();
@@ -48,12 +48,14 @@ const getIcon = (type) => {
   return '📍';
 };
 
-// data ophalen van de api
+// FETCH + ASYNC/AWAIT + PROMISES - data ophalen van de Brussels Open Data API
 const fetchData = async () => {
   tableBody.innerHTML = '<tr><td colspan="7">Data wordt geladen...</td></tr>';
 
   try {
+    // fetch geeft een promise terug, await wacht op het resultaat
     const response = await fetch(API_URL);
+    // JSON manipuleren - response omzetten naar javascript object
     const data = await response.json();
 
     allLocations = data.results;
@@ -61,18 +63,22 @@ const fetchData = async () => {
     fillFilter(allLocations);
     render(allLocations);
   } catch (error) {
+    // DOM manipulatie - foutmelding tonen in de tabel
     tableBody.innerHTML = '<tr><td colspan="7">Fout bij ophalen data</td></tr>';
     console.error('error:', error);
   }
 };
 
-// dropdown vullen met alle categorieën
+// FOREACH + ARRAY METHODE - dropdown vullen met unieke categorieën uit de data
 const fillFilter = (locations) => {
   const categories = [];
 
+  // forEach itereert over alle locaties
   locations.forEach(location => {
     if (location.visit_category_nl_multi) {
+      // geneste forEach om door categorieën per locatie te gaan
       location.visit_category_nl_multi.forEach(cat => {
+        // INCLUDES - controleren of categorie al in de lijst staat
         if (!categories.includes(cat)) {
           categories.push(cat);
         }
@@ -80,8 +86,10 @@ const fillFilter = (locations) => {
     }
   });
 
+  // SORT - categorieën alfabetisch sorteren
   categories.sort();
 
+  // DOM MANIPULATIE - opties toevoegen aan de dropdown
   categories.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat;
@@ -90,8 +98,9 @@ const fillFilter = (locations) => {
   });
 };
 
-// observer api - fade in effect
+// OBSERVER API - IntersectionObserver voor fade-in animatie bij scrollen
 const observer = new IntersectionObserver((entries) => {
+  // CALLBACK FUNCTION - wordt uitgevoerd telkens een element zichtbaar wordt
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
@@ -99,13 +108,13 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 
-// counters updaten
+// tellers updaten in de info-balk
 const updateCounts = (locations) => {
   resultsCount.textContent = `${locations.length} locaties gevonden`;
   favsCount.textContent = `${favorites.length} favorieten ★`;
 };
 
-// renderen op basis van huidige view
+// juiste weergave renderen op basis van huidige keuze
 const render = (locations) => {
   updateCounts(locations);
   if (currentView === 'table') {
@@ -115,7 +124,7 @@ const render = (locations) => {
   }
 };
 
-// tabel vullen
+// DOM MANIPULATIE - tabelrijen dynamisch opbouwen en invoegen
 const fillTable = (locations) => {
   tableBody.innerHTML = '';
 
@@ -125,9 +134,11 @@ const fillTable = (locations) => {
   }
 
   locations.forEach(location => {
+    // TERNARY OPERATOR - ster tonen als locatie al in favorieten zit
     const isFav = favorites.includes(location.id);
     const star = isFav ? '★' : '☆';
 
+    // TEMPLATE LITERAL - HTML string opbouwen met variabelen
     const row = `
       <tr>
         <td>${location.translations_nl_name ?? 'Onbekend'}</td>
@@ -142,16 +153,18 @@ const fillTable = (locations) => {
     tableBody.innerHTML += row;
   });
 
+  // CALLBACK FUNCTION + EVENT - kliklistener koppelen aan elke favoriet-knop
   document.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', toggleFavorite);
   });
 
+  // OBSERVER API - rijen registreren voor fade-in animatie
   document.querySelectorAll('tbody tr').forEach(row => {
     observer.observe(row);
   });
 };
 
-// kaarten vullen
+// DOM MANIPULATIE - kaarten dynamisch genereren en tonen
 const fillCards = (locations) => {
   cardsContainer.innerHTML = '';
 
@@ -162,10 +175,12 @@ const fillCards = (locations) => {
 
   locations.forEach(location => {
     const isFav = favorites.includes(location.id);
+    // TERNARY OPERATOR - gevulde of lege ster tonen
     const star = isFav ? '★' : '☆';
     const type = location.visit_category_nl_multi ? location.visit_category_nl_multi[0] : 'Onbekend';
     const icon = getIcon(type);
 
+    // TEMPLATE LITERAL - kaart HTML opbouwen
     const card = `
       <div class="card">
         <div class="card-icon">${icon}</div>
@@ -184,46 +199,53 @@ const fillCards = (locations) => {
     cardsContainer.innerHTML += card;
   });
 
+  // CALLBACK FUNCTION + EVENT - kliklistener koppelen aan elke favoriet-knop
   document.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', toggleFavorite);
   });
 
+  // OBSERVER API - kaarten registreren voor fade-in animatie
   document.querySelectorAll('.card').forEach(card => {
     observer.observe(card);
   });
 };
 
-// favoriet toggle
+// LOCALSTORAGE - favoriet toevoegen of verwijderen en opslaan
 const toggleFavorite = (event) => {
   const id = event.target.dataset.id;
 
+  // ARRAY METHODE (filter) - favoriet verwijderen als het er al in zit
   if (favorites.includes(id)) {
     favorites = favorites.filter(favId => favId !== id);
   } else {
     favorites.push(id);
   }
 
+  // LOCALSTORAGE - bijgewerkte lijst opslaan zodat die bewaard blijft
   localStorage.setItem('favorites', JSON.stringify(favorites));
   filterAndSearch();
 };
 
-// zoeken en filteren
+// FILTER + INCLUDES - zoekterm en categorie combineren om resultaten te filteren
 const filterAndSearch = () => {
   const searchTerm = searchInput.value.toLowerCase();
   const selectedFilter = filterSelect.value;
 
+  // ARRAY METHODE (filter) + ARROW FUNCTION - alleen matching locaties bijhouden
   const filtered = allLocations.filter(location => {
     const name = location.translations_nl_name?.toLowerCase() ?? '';
+    // INCLUDES - controleren of naam de zoekterm bevat
     const matchesSearch = searchTerm === '' ? true : name.includes(searchTerm);
     const matchesFilter = selectedFilter === '' ? true :
       location.visit_category_nl_multi?.includes(selectedFilter);
+    // beide voorwaarden moeten kloppen
     return matchesSearch && matchesFilter;
   });
 
   render(filtered);
 };
 
-// sorteren - fix: gaat nu door filterAndSearch zodat filter/zoek actief blijft
+// SORT ARRAY METHODE - locaties sorteren op naam of gemeente
 const sortLocations = () => {
   const sortValue = sortSelect.value;
 
@@ -236,15 +258,18 @@ const sortLocations = () => {
     return 0;
   });
 
+  // gesorteerde lijst opslaan zodat filter daarna nog werkt
   allLocations = sorted;
   filterAndSearch();
 };
 
-// wisselen tussen tabel en kaarten weergave
+// wisselen tussen tabel en kaarten, voorkeur opslaan in localStorage
 const switchView = (view) => {
   currentView = view;
+  // LOCALSTORAGE - weergavevoorkeur onthouden
   localStorage.setItem('view', view);
 
+  // DOM MANIPULATIE - juiste weergave tonen en verbergen
   if (view === 'table') {
     tableView.style.display = 'table';
     cardsContainer.style.display = 'none';
@@ -260,14 +285,14 @@ const switchView = (view) => {
   filterAndSearch();
 };
 
-// event listeners
+// EVENTS + CALLBACK FUNCTIONS - luisteren naar gebruikersacties
 searchInput.addEventListener('input', filterAndSearch);
 filterSelect.addEventListener('change', filterAndSearch);
 sortSelect.addEventListener('change', sortLocations);
 viewTableBtn.addEventListener('click', () => switchView('table'));
 viewCardsBtn.addEventListener('click', () => switchView('cards'));
 
-// reset alle filters
+// alle filters resetten en volledige lijst opnieuw tonen
 resetBtn.addEventListener('click', () => {
   searchInput.value = '';
   filterSelect.value = '';
@@ -275,7 +300,7 @@ resetBtn.addEventListener('click', () => {
   render(allLocations);
 });
 
-// alle favorieten wissen
+// LOCALSTORAGE:  alle favorieten wissen na bevestiging
 clearFavsBtn.addEventListener('click', () => {
   if (confirm('Ben je zeker dat je alle favorieten wilt wissen?')) {
     favorites = [];
@@ -284,23 +309,26 @@ clearFavsBtn.addEventListener('click', () => {
   }
 });
 
-// voorkeursweergave laden bij start
+// voorkeurweergave toepassen bij het laden van de pagina
 switchView(currentView);
 
-// app starten
+// app opstarten: data ophalen van de API
 fetchData();
 
-// formulier validatie
+// FORMULIER VALIDATIE:  invoervelden controleren voor opslaan
 const form = document.getElementById('suggestion-form');
 const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('email');
 const suggestionInput = document.getElementById('suggestion');
 const suggestionsList = document.getElementById('suggestions-list');
 
+// LOCALSTORAGE: eerder ingediende suggesties laden
 let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
 
+// DOM MANIPULATIE - opgeslagen suggesties tonen op de pagina
 const showSuggestions = () => {
   suggestionsList.innerHTML = '';
+  // TEMPLATE LITERAL + FOREACH,  elke suggestie als HTML blok renderen
   suggestions.forEach(s => {
     suggestionsList.innerHTML += `
       <div class="suggestion-item">
@@ -311,32 +339,38 @@ const showSuggestions = () => {
   });
 };
 
+// FORMULIER VALIDATIE:  velden controleren bij indienen
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  // foutmeldingen eerst leegmaken
   document.getElementById('name-error').textContent = '';
   document.getElementById('email-error').textContent = '';
   document.getElementById('suggestion-error').textContent = '';
 
   let valid = true;
 
+  // naam moet minstens 3 tekens zijn
   if (nameInput.value.trim().length < 3) {
     document.getElementById('name-error').textContent = 'Naam moet minstens 3 letters hebben';
     valid = false;
   }
 
+  // emailadres valideren met een regex patroon
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(emailInput.value)) {
     document.getElementById('email-error').textContent = 'Geen geldig email adres';
     valid = false;
   }
 
+  // suggestie mag niet leeg zijn
   if (suggestionInput.value.trim() === '') {
     document.getElementById('suggestion-error').textContent = 'Suggestie mag niet leeg zijn';
     valid = false;
   }
 
   if (valid) {
+    // LOCALSTORAGE: nieuwe suggestie opslaan zodat die bewaard blijft
     suggestions.push({
       name: nameInput.value,
       email: emailInput.value,
@@ -349,4 +383,5 @@ form.addEventListener('submit', (e) => {
   }
 });
 
+// suggesties tonen bij het laden van de pagina
 showSuggestions();
