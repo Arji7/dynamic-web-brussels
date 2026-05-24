@@ -120,7 +120,7 @@ npm run preview
 ---
 ## Screenshots
 
-> Voeg hier screenshots toe van de applicatie.
+
 <img width="2824" height="1295" alt="image" src="https://github.com/user-attachments/assets/4524d908-4c99-4ea6-be99-9508bffdf38c" />
 <img width="2879" height="1291" alt="image" src="https://github.com/user-attachments/assets/9cf88887-c23c-48a5-bcc8-e3abe8d5cc60" />
 
@@ -178,4 +178,4 @@ dynamic-web-brussels/
 - [Brussels Open Data](https://opendata.brussels.be/) - API voor culturele en toeristische locaties
 - [Vite](https://vitejs.dev/) - Build tool en dev server
 - [MDN Web Docs](https://developer.mozilla.org/) - Referentie voor JavaScript, CSS en Web API's
-- - **AI assistent:** Claude (Anthropic) — zie [ai-log.md](ai-log.md) voor de volledige AI log
+- **AI assistent:** Claude (Anthropic) — zie [ai-log.md](ai-log.md) voor de volledige AI log
