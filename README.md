@@ -161,6 +161,7 @@ npm run preview
 ```
 dynamic-web-brussels/
 ├── index.html              # Hoofd HTML-bestand
+├── ai-log.md               # AI-gebruik chatlog
 ├── package.json            # Project configuratie en scripts
 ├── public/                 # Statische bestanden
 │   └── vite.svg
