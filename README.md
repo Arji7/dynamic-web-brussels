@@ -156,6 +156,9 @@ npm run preview
 
 ## Folderstructuur
 
+
+
+```
 dynamic-web-brussels/
 ├── index.html              # Hoofd HTML-bestand
 ├── package.json            # Project configuratie en scripts
